@@ -24,7 +24,7 @@ var fsm = new StateMachine({
     onCondense: function() { console.log('I condensed') }
   }
 });
-*/
+
 // 當有人傳送訊息給 Bot 時
 bot.on('message', function (event) {
   // 回覆訊息給使用者 (一問一答所以是回覆不是推送)
