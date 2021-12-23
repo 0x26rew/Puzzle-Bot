@@ -1,52 +1,73 @@
 // 引用 line bot SDK
-let linebot = require('linebot');
+var linebot = require('linebot');
 var StateMachine = require('javascript-state-machine');
 // 初始化 line bot 需要的資訊，在 Heroku 上的設定的 Config Vars，可參考 Step2
-let bot = linebot({
-  channelId: '1656749970',
-  channelSecret: 'ab469e76a7c7d5cf6d673f4603c5a333',
-  channelAccessToken: 'hg4nDSt05DAV0QzPE1B06IFwjmTZ4frRiRWnIRcMq45ZPuKBukesU/5XK91kNmZcvH+53NFnON4m/01Dhsx2ABlmOcYmlp1N4kNj0ZhFrsSHcZnaSc3MY+kon5a/zO2rrpsvl7r1nsTp6seWdNyFPQdB04t89/1O/w1cDnyilFU='
-
-  /*
+var bot = linebot({
   channelId: process.env.LINE_CHANNEL_ID,
   channelSecret: process.env.LINE_CHANNEL_SECRET,
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
-  */
+});
+const line = require('@line/bot-sdk');
+const client = new line.Client({
+  channelSecret: process.env.LINE_CHANNEL_SECRET,
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
 });
 
-
 var fsm = new StateMachine({
-  init: 'solid',
+  init: 'floor1',
   transitions: [
-    { name: 'melt',     from: 'solid',  to: 'liquid' },
-    { name: 'freeze',   from: 'liquid', to: 'solid'  },
-    { name: 'vaporize', from: 'liquid', to: 'gas'    },
-    { name: 'condense', from: 'gas',    to: 'liquid' }
+    { name: 'upStair',     from: 'floor1',  to: 'floor2' },
+    { name: 'upStair',     from: 'floor2',  to: 'floor3' },
+    { name: 'upStair',     from: 'floor3',  to: 'floor4' },
+    { name: 'upStair',     from: 'floor4',  to: 'floor5' },
+    { name: 'downStair',   from: 'floor5',  to: 'floor4' },
+    { name: 'downStair',   from: 'floor4',  to: 'floor3' },
+    { name: 'downStair',   from: 'floor3',  to: 'floor2' },
+    { name: 'downStair',   from: 'floor2',  to: 'floor1' },
   ],
   methods: {
-    onMelt:     function() { console.log('I melted')    },
-    onFreeze:   function() { console.log('I froze')     },
-    onVaporize: function() { console.log('I vaporized') },
-    onCondense: function() { console.log('I condensed') }
+    onUpStair:     function() { console.log('up');},
+    onDownStair:   function() { console.log('down') }
   }
 });
 
+var destId;
 // 當有人傳送訊息給 Bot 時
 bot.on('message', function (event) {
   // 回覆訊息給使用者 (一問一答所以是回覆不是推送)
-  var replystr = `你說了 ${event.message.text}`;
   //event.reply(`你說了 ${event.message.text}`);
-
-  if (fsm.is('solid')) {
-    fsm.melt();
-    event.reply(`${replystr}\n融化ㄌ`);
-  } else if (fsm.is('liquid')) {
-    fsm.vaporize();
-    event.reply(`${replystr}\n蒸發ㄌ`);
-  } else if (fsm.is('gas')) {
-    fsm.condense();
-    event.reply(`${replystr}\n凝結ㄌ`);
+  //console.log('down');
+  if (event.source.groupId != undefined) {
+    destId = event.source.groupId;
+  } else {
+    destId = event.source.userId;
   }
+
+  if (event.message.text === '上樓') {
+    if (fsm.can('upStair')) {
+      fsm.upStair();
+      console.log('up');
+      event.reply(`上樓囉`);
+      showfloor(fsm, destId);
+    } else {
+      event.reply(`上你媽啦`);
+    }
+  } else if (event.message.text === '下樓') {
+    if (fsm.can('downStair')) {
+      fsm.downStair();
+      console.log('down');
+      event.reply(`下樓囉`);
+      showfloor(fsm, destId);
+    } else {
+      event.reply(`下你媽啦`);
+    }
+  } else if (event.message.text === '我在哪裡') {
+    showfloor(fsm, destId);
+  } else {
+    //event.reply(`公三小`);
+  }
+
+  
 
 });
 
@@ -54,3 +75,24 @@ bot.on('message', function (event) {
 bot.listen('/', process.env.PORT || 5000, function () {
   console.log('全國首家LINE線上機器人上線啦！！');
 });
+
+function showfloor(machine, sentId) {
+  switch (machine.state) {
+    case 'floor1':
+      client.pushMessage(destId, {type: 'text', text: '你在1樓'});
+      break;
+    case 'floor2':
+      client.pushMessage(destId, {type: 'text', text: '你在2樓'});
+      break;
+    case 'floor3':
+      client.pushMessage(destId, {type: 'text', text: '你在3樓'});
+      break;
+    case 'floor4':
+      client.pushMessage(destId, {type: 'text', text: '你在4樓'});
+      break;
+    case 'floor5':
+      client.pushMessage(destId, {type: 'text', text: '你在5樓'});
+      break;
+    default:
+  }
+}
