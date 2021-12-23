@@ -1,0 +1,17 @@
+{
+  "name": "pnn-chatbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "javascript-state-machine": "^3.1.0"
+  },
+  "dependencies": {
+    "linebot": "^1.6.1"
+  }
+}
