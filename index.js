@@ -8,6 +8,23 @@ let bot = linebot({
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
 });
 
+var StateMachine = require('javascript-state-machine');
+var fsm = new StateMachine({
+  init: 'solid',
+  transitions: [
+    { name: 'melt',     from: 'solid',  to: 'liquid' },
+    { name: 'freeze',   from: 'liquid', to: 'solid'  },
+    { name: 'vaporize', from: 'liquid', to: 'gas'    },
+    { name: 'condense', from: 'gas',    to: 'liquid' }
+  ],
+  methods: {
+    onMelt:     function() { console.log('I melted')    },
+    onFreeze:   function() { console.log('I froze')     },
+    onVaporize: function() { console.log('I vaporized') },
+    onCondense: function() { console.log('I condensed') }
+  }
+});
+
 // 當有人傳送訊息給 Bot 時
 bot.on('message', function (event) {
   // 回覆訊息給使用者 (一問一答所以是回覆不是推送)
