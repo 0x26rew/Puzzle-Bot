@@ -1,0 +1,52 @@
+{
+    "type": "flex",
+    "altText": "開始猜謎!",
+    "contents": {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "挑戰成功",
+              "size": "lg",
+              "align": "center"
+            }
+          ]
+        },
+        "body": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "真了不起欸",
+              "wrap": true
+            }
+          ]
+        },
+        "footer": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "繼續玩",
+                "data": "繼續玩"
+              }
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "結束遊戲",
+                "data": "結束遊戲"
+              }
+            }
+          ]
+        }
+    }
+}

@@ -1,0 +1,84 @@
+{
+  "type": "flex",
+  "altText": "猜謎",
+  "contents": {
+    "type": "bubble",
+    "size": "kilo",
+    "header": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "text",
+          "text": "問題",
+          "size": "xl"
+        }
+      ]
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "text",
+          "offsetBottom": "none",
+          "offsetEnd": "none",
+          "position": "relative",
+          "align": "start",
+          "wrap": true,
+          "text": "問題內容"
+        }
+      ],
+      "offsetTop": "none",
+      "offsetBottom": "none",
+      "justifyContent": "center"
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "button",
+          "action": {
+            "type": "postback",
+            "label": "我要提示",
+            "data": "我要提示"
+          },
+          "offsetTop": "none",
+          "offsetBottom": "none",
+          "height": "sm",
+          "offsetStart": "none",
+          "offsetEnd": "none"
+        },
+        {
+          "type": "button",
+          "action": {
+            "type": "postback",
+            "label": "換個題目",
+            "data": "換個題目"
+          },
+          "height": "sm",
+          "offsetTop": "none",
+          "offsetBottom": "none",
+          "offsetStart": "none",
+          "offsetEnd": "none"
+        },
+        {
+          "type": "button",
+          "action": {
+            "type": "postback",
+            "label": "我要放棄",
+            "data": "我要放棄"
+          },
+          "height": "sm",
+          "offsetTop": "none",
+          "offsetBottom": "none",
+          "offsetStart": "none",
+          "offsetEnd": "none"
+        }
+      ],
+      "borderWidth": "none",
+      "height": "140px"
+    }
+  }
+}
