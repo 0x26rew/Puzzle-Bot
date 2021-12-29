@@ -169,6 +169,7 @@ async function getUser(event, userLog) {
       fsm.goto(userLog.users[i].userState);
       history = userLog.users[i].userHistory;
       userNum = i;
+      questionNumber = history.slice(-1);
       return;
     }
   }
@@ -209,6 +210,9 @@ async function saveUserLog(event, userLog) {
 async function onMessage(event) {
   let userLog = JSON.parse(fs.readFileSync("users.json"));
   await getUser(event, userLog);
+  console.log('user ' + event.source.userId);
+  console.log('message is '+ event.message.text);
+  console.log('answer is ' + questions.contents[questionNumber].answer);
   if (fsm.is('initial')) {
     event.reply(start);
   } else if (fsm.is('end-of-game')) {
@@ -217,9 +221,6 @@ async function onMessage(event) {
     checkAnswer(event);
   }
   await saveUserLog(event, userLog);
-  console.log('user ' + event.source.userId);
-  console.log('message is '+ event.message.text);
-  console.log('answer is ' + questions.contents[questionNumber].answer);
   console.log('state is ' + fsm.state);
 }
 /*****************************************************************************/
@@ -237,7 +238,7 @@ async function onPostback(event) {
   await saveUserLog(event, userLog);
   console.log('user ' + event.source.userId);
   console.log('postback is ' + event.postback.data);
-  console.log('answer is ' + questions.contents[questionNumber].answer);
+  //console.log('answer is ' + questions.contents[questionNumber].answer);
   console.log('state is ' + fsm.state);
 }
 /*****************************************************************************/
