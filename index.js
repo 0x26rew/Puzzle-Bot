@@ -51,7 +51,7 @@ let fsm = new StateMachine({
 /* Required files */
 const fs = require('fs');
 
-let questions = JSON.parse(fs.readFileSync("questions.json"));
+let questions = JSON.parse(fs.readFileSync("questions/questions.json"));
 
 let puzzleMsg = JSON.parse(fs.readFileSync("flexMsgs/puzzleMsg.json"));
 
@@ -269,15 +269,16 @@ async function saveUserLog(event, userLog) {
     userLog.users[userNum].userState = fsm.state;
     userLog.users[userNum].userHistory = history;
   }
-  fs.writeFileSync('users.json', JSON.stringify(userLog, null, ' '), 'utf8');
 }
 /*****************************************************************************/
 async function responseMessage(event) {
   /* Handle message events */
-  let userLog = JSON.parse(fs.readFileSync("users.json"));
+  let userLog = JSON.parse(fs.readFileSync("users/users.json"));
   await getUser(event, userLog);
+
   console.log('user ' + event.source.userId);
   console.log('message is '+ event.message.text);
+
   if (questionNumber >= 0)
     console.log('answer is ' + questions.contents[questionNumber].answer);
 
@@ -288,13 +289,16 @@ async function responseMessage(event) {
   } else {
     checkAnswer(event);
   }
+
   await saveUserLog(event, userLog);
+  fs.writeFileSync('users/users.json', JSON.stringify(userLog, null, ' '), 'utf8');
+  
   console.log('state is ' + fsm.state);
 }
 /*****************************************************************************/
 async function responsePostback(event) {
   /* Handle postback event */
-  let userLog= JSON.parse(fs.readFileSync("users.json"));
+  let userLog= JSON.parse(fs.readFileSync("users/users.json"));
   await getUser(event, userLog);
   
   if (fsm.is('initial')) {
@@ -305,6 +309,7 @@ async function responsePostback(event) {
     giveAssist(event);
   }
   await saveUserLog(event, userLog);
+  fs.writeFileSync('users/users.json', JSON.stringify(userLog, null, ' '), 'utf8');
   console.log('user ' + event.source.userId);
   console.log('postback is ' + event.postback.data);
   //console.log('answer is ' + questions.contents[questionNumber].answer);
