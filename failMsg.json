@@ -1,0 +1,63 @@
+{
+    "type": "flex",
+    "altText": "開始猜謎!",
+    "contents": {
+      "type": "bubble",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "挑戰失敗",
+            "size": "lg",
+            "align": "center"
+          }
+        ]
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "真是太遜了",
+            "align": "center"
+          },
+          {
+            "type": "text",
+            "text": "謎底",
+            "wrap": true
+          },
+          {
+            "type": "text",
+            "text": "解答",
+            "wrap": true
+          }
+        ]
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "button",
+            "action": {
+              "type": "postback",
+              "label": "繼續玩",
+              "data": "繼續玩"
+            },
+            "style": "primary"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "postback",
+              "label": "結束遊戲",
+              "data": "結束遊戲"
+            }
+          }
+        ]
+      }
+    }
+}

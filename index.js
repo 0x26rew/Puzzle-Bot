@@ -1,21 +1,27 @@
-let linebot = require('linebot');
-
+/*  Use 'javasript-state-machine' to implement the finate state machine 
+    
+    <States>
+    initial:  state before the game start.
+    gaming :  the user received a puzzle from bot and tries to figure it out
+              without a hint.
+    hinted :  the user is hinted while the current puzzle is unsolved.
+    end-of-game: the user wins/loses the game, the robot will puzzleMsg if 
+              he/she want to play again.
+    ---------------------------------------------------------------------------
+    <Transitions>
+    wrong: user send a text message in state 'gaming' or 'hinted' but the
+           text is imcompatable with the answer of current puzzle.
+    right: user send a text message in state 'gaming' or 'hinted' and the 
+           text is compatible with the answer.
+    change: user send a postback to change another puzzle.
+    hint:  user puzzleMsg for a hint of this puzzle for the first time.
+    restart: restart the game and the user get his/her first question.
+    end:   user wins or loses the game.
+    exit:  user leaves the game.
+    goto:  go to the target state directly.
+ */
 let StateMachine = require('javascript-state-machine');
 
-const line = require('@line/bot-sdk');
-
-let bot = linebot({
-  channelId: process.env.LINE_CHANNEL_ID,
-  channelSecret: process.env.LINE_CHANNEL_SECRET,
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
-});
-
-const client = new line.Client({
-  channelSecret: process.env.LINE_CHANNEL_SECRET,
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
-});
-
-/*****************************************************************************/
 let fsm = new StateMachine({
   init: 'initial',
   transitions: [
@@ -24,7 +30,8 @@ let fsm = new StateMachine({
     { name: 'right',     from: ['gaming', 'hinted'],  to: 'gaming' },
     { name: 'change',    from: ['gaming', 'hinted'],  to: 'gaming' },
     { name: 'hint',      from: 'gaming', to: 'hinted' },
-    { name: 'restart',   from: ['initial', 'gaming', 'hinted', 'end-of-game'],  to: 'gaming' },
+    { name: 'restart',   from: ['initial', 'gaming', 'hinted', 'end-of-game'],
+                         to: 'gaming' },
     { name: 'end',       from: ['gaming', 'hinted'],  to: 'end-of-game' },
     { name: 'exit',      from: ['gaming', 'hinted', 'end-of-game'], to: 'initial' },
     { name: 'goto', from: '*', to: function(s) { return s } }
@@ -41,32 +48,71 @@ let fsm = new StateMachine({
   }
 });
 /*****************************************************************************/
+/* Required files */
+const fs = require('fs');
+
+let puzzleMsg = JSON.parse(fs.readFileSync("puzzleMsg.json"));
+
+let questions = JSON.parse(fs.readFileSync("questions.json"));
+
+let startMsg = JSON.parse(fs.readFileSync("startMsg.json"));
+
+let passMsg = JSON.parse(fs.readFileSync("passMsg.json"));
+
+let failMsg = JSON.parse(fs.readFileSync("failMsg.json"));
+/*****************************************************************************/
+let questionNumber; /* The place of a question in array 'questions.contents' */
+let userNum;        /* The place of a question in array 'userLog.users'      */
+
+let maxWrong = 10;  /* User can not made more than 10 wrong guesses or he/she 
+                       lose the game */
+let maxRight = 10;  /* User must answer 10 puzzles correctly to win the game */
+let maxHint = 6;    /* User can be hinted for 6 times in a game */
+let maxChange = 5;  /* User can change his/her puzzle at most 5 times in 
+                       one game */
+
+let userWrong;      /* <= maxWrong */
+let userRight;      /* <= maxRight */
+let hintUsed;       /* <= maxHint */
+let changeUsed;     /* <= maxChange */
+
+let history = [];   /* The question that the user has seen */
+/*****************************************************************************/
 function wrongGuess(event) {
   if (++userWrong == maxWrong) {
-    fail.contents.body.contents[0].text = '答案: ' + questions.contents[questionNumber].answer;
-    fail.contents.body.contents[1].text = '解釋: ' + questions.contents[questionNumber].reason;
-    event.reply(fail);
+    /* User reach the limit of wrong guess and fails the game */
+    failMsg.contents.body.contents[1].text = 
+      '謎底: ' + questions.contents[questionNumber].answer;
+    failMsg.contents.body.contents[2].text = 
+      '解答: ' + questions.contents[questionNumber].reason;
+    event.reply(failMsg);
     history = [];
-    fsm.end();
+    fsm.end();  /* into the 'end-of-game' state */
   } else {
-    event.reply(['恭喜你答錯了', '你還剩下' + (maxWrong - userWrong).toString() + '次機會']);
+    /* User still has chance to guess */
+    event.reply(['恭喜你答錯了', 
+      '你還剩下' + (maxWrong - userWrong).toString() + '次機會']);
     fsm.wrong();
   }
 }
 /*****************************************************************************/
 function rightGuess(event) {
   if (++userRight == maxRight) {
-    event.reply(pass);
+    /* User wins the game and goes into the 'end-of-game' state */
+    event.reply(passMsg);
     history = [];
     fsm.end();
   }
   else {
+    /* User made a right guess and is going to proceed to next question */
     event.reply(['嘿嘿賓果答對了', nextQuestion(userRight)]);
     fsm.right();
   }
 }
 /*****************************************************************************/
 function checkAnswer(event) {
+  /* Using will current state is 'gaming' or 'hinted' and bot receives a text
+     message */
   if (event.message.text === questions.contents[questionNumber].answer) {
     rightGuess(event);
   } else {
@@ -75,25 +121,33 @@ function checkAnswer(event) {
 }
 /*****************************************************************************/
 function nextQuestion(stage) {
+  /* Return a new puzzle message */
   let flag;
+  /* Randomly select a question and check if the question is in the user's 
+     history */
   do {
     flag = 0;
-    questionNumber =  Math.floor(Math.random()*(questions.contents.length));
-    history.push(questionNumber);
-    for (let i = 0; i < history.length - 1; i++) {
+    questionNumber =  Math.floor(Math.random()*(questions.contents.length));  
+    for (let i = 0; i < history.length; i++) {
       if (history[i] == questionNumber)  {
-        history.pop();
         flag = 1;
         break;
       }
     }
   } while (flag == 1);
-  ask.contents.header.contents[0].text = '第' + (stage + 1).toString() + '題';
-  ask.contents.body.contents[0].text = questions.contents[questionNumber].question;
-  return ask;
+
+  history.push(questionNumber);
+
+  puzzleMsg.contents.header.contents[0].text = 
+    '第' + (stage + 1).toString() + '題';
+  puzzleMsg.contents.body.contents[0].text = 
+    questions.contents[questionNumber].question;
+  return puzzleMsg;
 }
 /*****************************************************************************/
 function giveHint(event) {
+  /* Give the user a hint of puzzle only if the state is 'gaming' and he/she 
+     still has chance to get a hint */
   if (fsm.is('hinted')) {
     event.reply('這題已經用過提示了!');
   } else if (hintUsed  == maxHint) {
@@ -108,6 +162,8 @@ function giveHint(event) {
 }
 /*****************************************************************************/
 function changeQuestion(event) {
+  /* Give the user a new puzzle if he/she still has chance to change
+     questions */
   if (changeUsed == maxChange) {
     event.reply('換題目的機會用完了喔!');
   }
@@ -115,49 +171,57 @@ function changeQuestion(event) {
     changeUsed++;
     fsm.change();
     let msg = (changeUsed == maxChange) ? '之後不能再換題目囉' : 
-              '換一題,你還可以再換' + (maxChange - changeUsed).toString() + '次題目';
+      '換一題,你還可以再換' + (maxChange - changeUsed).toString() + '次題目';
     event.reply([msg, nextQuestion(userRight)]);
   }
 }
 /*****************************************************************************/
 function restartGame(event) {
+  /* Reset the following element before restart and ask a new question */
   hintUsed = 0;
   changeUsed = 0;
   userWrong = 0;
   userRight = 0;
   history = [];
   nextQuestion(0);
-  event.reply(ask);
+  event.reply(puzzleMsg);
   fsm.restart();
 }
 /*****************************************************************************/
-function checkOnEnd(event) {
+function leaveorAgain(event) {
+  /* On the 'end-of-game' stage, user can make a choice to play again or leave 
+     the game */
   if (event.postback.data === '繼續玩') {
     restartGame(event);
   } else if (event.postback.data === '結束遊戲') {
     fsm.exit();
-    event.reply(start);
+    event.reply(startMsg);
   }
 }
 /*****************************************************************************/
 function gameInit(event) {
+  /* Initialize the game if user press the '開始猜謎' button */
   if (event.postback.data === '開始猜謎') {
     restartGame(event);
   }
 }
 /*****************************************************************************/
 function giveAssist(event) {
+  /* Give the user a correspnding assistence */
   if (event.postback.data === '我要提示') {
     giveHint(event);
   } else if (event.postback.data === '我要放棄') {
     fsm.exit();
-    event.reply(start);
+    event.reply(startMsg);
   } else if (event.postback.data === '換個題目') {
     changeQuestion(event);
   }
 }
 /*****************************************************************************/
 async function getUser(event, userLog) {
+  /* While receive a message or postback from a user, check if the userId is in 
+     userLog or not. If the user is new, initializing the state and other 
+     attributes, or load back the attribute of the user otherwise. */
   let destId = (event.source.groupId === undefined) ? 
                 event.source.userId : event.source.groupId;
   for (let i = 0; i < userLog.users.length; i++) {
@@ -169,7 +233,7 @@ async function getUser(event, userLog) {
       fsm.goto(userLog.users[i].userState);
       history = userLog.users[i].userHistory;
       userNum = i;
-      questionNumber = history.slice(-1);
+      questionNumber = (history.length == 0) ? -1 : history.slice(-1);
       return;
     }
   }
@@ -184,6 +248,7 @@ async function getUser(event, userLog) {
 }
 /*****************************************************************************/
 async function saveUserLog(event, userLog) {
+  /* Save the attrbutes and state of user in users.json */
   let destId = (event.source.groupId === undefined) ? 
                 event.source.userId : event.source.groupId;
   if (userNum == -1) {
@@ -204,17 +269,20 @@ async function saveUserLog(event, userLog) {
     userLog.users[userNum].userState = fsm.state;
     userLog.users[userNum].userHistory = history;
   }
-  fs.writeFileSync('users.json', JSON.stringify(userLog, null, ' '), 'utf8');;
+  fs.writeFileSync('users.json', JSON.stringify(userLog, null, ' '), 'utf8');
 }
 /*****************************************************************************/
-async function onMessage(event) {
+async function responseMessage(event) {
+  /* Handle message events */
   let userLog = JSON.parse(fs.readFileSync("users.json"));
   await getUser(event, userLog);
   console.log('user ' + event.source.userId);
   console.log('message is '+ event.message.text);
-  console.log('answer is ' + questions.contents[questionNumber].answer);
+  if (questionNumber >= 0)
+    console.log('answer is ' + questions.contents[questionNumber].answer);
+
   if (fsm.is('initial')) {
-    event.reply(start);
+    event.reply(startMsg);
   } else if (fsm.is('end-of-game')) {
     event.reply('本次遊戲已經結束');
   } else {
@@ -224,14 +292,15 @@ async function onMessage(event) {
   console.log('state is ' + fsm.state);
 }
 /*****************************************************************************/
-async function onPostback(event) {
+async function responsePostback(event) {
+  /* Handle postback event */
   let userLog= JSON.parse(fs.readFileSync("users.json"));
   await getUser(event, userLog);
   
   if (fsm.is('initial')) {
     gameInit(event);
   } else if (fsm.is('end-of-game')) {
-    checkOnEnd(event);
+    leaveorAgain(event);
   } else {
     giveAssist(event);
   }
@@ -242,46 +311,20 @@ async function onPostback(event) {
   console.log('state is ' + fsm.state);
 }
 /*****************************************************************************/
-//const editJsonFile = require("edit-json-file");
-const fs = require('fs');
+let linebot = require('linebot');
 
-let askFile = "ask.json";
-let ask = JSON.parse(fs.readFileSync(askFile));
-
-let questionFile = "questions.json";
-let questions = JSON.parse(fs.readFileSync(questionFile));
-
-let startFile = "start.json";
-let start = JSON.parse(fs.readFileSync(startFile));
-
-let passFile = "pass.json";
-let pass = JSON.parse(fs.readFileSync(passFile));
-
-let failFile = "fail.json";
-let fail = JSON.parse(fs.readFileSync(failFile));
-/*****************************************************************************/
-let questionNumber = Math.floor(Math.random()*(questions.contents.length));
-
-let userNum;
-
-let maxHint = 6;
-let maxRight = 10;
-let maxWrong = 10;
-let maxChange = 5;
-
-let hintUsed = 0;
-let changeUsed = 0;
-let userRight = 0;
-let userWrong = 0;
-
-let history = [];
+let bot = linebot({
+  channelId: process.env.LINE_CHANNEL_ID,
+  channelSecret: process.env.LINE_CHANNEL_SECRET,
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
+});
 /*****************************************************************************/
 bot.on('message', function (event) {
-  onMessage(event);
+  responseMessage(event);
 });
 /*****************************************************************************/
 bot.on('postback', function (event) {
-  onPostback(event);
+  responsePostback(event);
 });
 /*****************************************************************************/
 bot.listen('/', process.env.PORT || 5000, function () {
