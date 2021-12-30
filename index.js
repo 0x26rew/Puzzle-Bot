@@ -51,15 +51,15 @@ let fsm = new StateMachine({
 /* Required files */
 const fs = require('fs');
 
-let puzzleMsg = JSON.parse(fs.readFileSync("puzzleMsg.json"));
-
 let questions = JSON.parse(fs.readFileSync("questions.json"));
 
-let startMsg = JSON.parse(fs.readFileSync("startMsg.json"));
+let puzzleMsg = JSON.parse(fs.readFileSync("flexMsgs/puzzleMsg.json"));
 
-let passMsg = JSON.parse(fs.readFileSync("passMsg.json"));
+let startMsg = JSON.parse(fs.readFileSync("flexMsgs/startMsg.json"));
 
-let failMsg = JSON.parse(fs.readFileSync("failMsg.json"));
+let passMsg = JSON.parse(fs.readFileSync("flexMsgs/passMsg.json"));
+
+let failMsg = JSON.parse(fs.readFileSync("flexMsgs/failMsg.json"));
 /*****************************************************************************/
 let questionNumber; /* The place of a question in array 'questions.contents' */
 let userNum;        /* The place of a question in array 'userLog.users'      */
