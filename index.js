@@ -309,10 +309,10 @@ async function responsePostback(event) {
     giveAssist(event);
   }
   await saveUserLog(event, userLog);
-  fs.writeFileSync('users/users.json', JSON.stringify(userLog, null, ' '), 'utf8');
+  fs.writeFileSync('users/users.json', 
+    JSON.stringify(userLog, null, ' '), 'utf8');
   console.log('user ' + event.source.userId);
   console.log('postback is ' + event.postback.data);
-  //console.log('answer is ' + questions.contents[questionNumber].answer);
   console.log('state is ' + fsm.state);
 }
 /*****************************************************************************/
