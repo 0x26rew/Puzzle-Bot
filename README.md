@@ -21,53 +21,37 @@
 
 ### Demo
 
-* Send the first text message to Puzzle-Bot, it replies a flex message with a start button:
+Send the first text message to Puzzle-Bot, it replies a flex message with a start button:
 
-  <img src='img/270031880_1356007481481403_8564349989198662052_n.png' width=25% height=25% align="left">
+<img src='img/270031880_1356007481481403_8564349989198662052_n.png' width=25% height=25% align="left">
 
-<br>
+Press the start button to start the game, user will get the first puzzle of the game from Puzzle-Bot: 
 
-* Press the start button to start the game, user will get the first puzzle of the game from Puzzle-Bot: 
+<img src='img/269925829_272509138114286_4578919156614183582_n.png' width=25% height=25% align='left'>
 
-  <img src='img/269925829_272509138114286_4578919156614183582_n.png' width=25% height=25% align='left'>
+Send a text message as the answer of the puzzle, but Puzzle-Bot noticed that it is a wrong guess and the remaining chances for incorrect answers of the user:
 
-<br>
+<img src='img/270189170_1851471278384810_299343801887773322_n.png' width=25% height=25% align='left'>
 
-* Send a text message as the answer of the puzzle, but Puzzle-Bot noticed that it is a wrong guess and the remaining chances for incorrect answers of the user:
+Press the hint button to get a hint from Puzzle-Bot, it will also notice that the remaining chances for using hints:
 
-  <img src='img/270189170_1851471278384810_299343801887773322_n.png' width=25% height=25% align='left'>
+<img src='img/269794836_237669245177752_6645258430638655040_n.png' width=25% height=25% align='left'>
 
-<br>
+Send a new text message with the correct answer, Puzzle-Bot will send a greeting message and the next puzzle:
 
-* Press the hint button to get a hint from Puzzle-Bot, it will also notice that the remaining chances for using hints:
+<img src='img/270204711_498093891576938_7980406333132754409_n.png' width=25% height=25% align='left'>
 
-  <img src='img/269794836_237669245177752_6645258430638655040_n.png' width=25% height=25% align='left'>
+If the user ask for hint for a puzzle is already hinted, he/she will get a notification from Puzzle-Bot:
 
-<br>
+<img src='img/270031668_444569877396714_8428201607966229601_n.png' width=25% height=25% align='left'>
 
-* Send a new text message with the correct answer, Puzzle-Bot will send a greeting message and the next puzzle:
+Choose to play again or leave when the game is finished:
 
-  <img src='img/270204711_498093891576938_7980406333132754409_n.png' width=25% height=25% align='left'>
+<img src='img/268712167_709415553324162_131955599582078364_n.png' width=25% height=25% align='left'>
 
-<br>
+It is forbidden to send messages other than text:
 
-* But if the user ask for hint for a puzzle is already hinted, he/she will get a notification from Puzzle-Bot:
-
-  <img src='img/270031668_444569877396714_8428201607966229601_n.png' width=25% height=25% align='left'>
-
-<br>
-
-* Choose to play again or leave when the game is finished:
-
-  <img src='img/268712167_709415553324162_131955599582078364_n.png' width=25% height=25% align='left'>
-
-<br>
-
-* It is forbidden to send messages other than text:
-
-  <img src='img/269893773_496724921773098_1617813665918363966_n.jpg' width=25% height=25% align='left'>
-
-<br>
+<img src='img/269893773_496724921773098_1617813665918363966_n.jpg' width=25% height=25% align='left'>
 
 ## Dependencies
 
