@@ -1,0 +1,43 @@
+{
+    "type": "flex",
+    "altText": "你好厲害呦",
+    "contents": {
+      "type": "bubble",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "挑戰成功",
+            "size": "lg",
+            "align": "center"
+          }
+        ],
+        "height": "100px"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "button",
+            "action": {
+              "type": "postback",
+              "label": "繼續玩",
+              "data": "繼續玩"
+            },
+            "style": "primary"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "postback",
+              "label": "結束遊戲",
+              "data": "結束遊戲"
+            }
+          }
+        ]
+      }
+    }
+}

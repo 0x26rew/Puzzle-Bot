@@ -20,7 +20,11 @@
     exit:  user leaves the game.
     goto:  go to the target state directly.
  */
-let StateMachine = require('javascript-state-machine');
+const StateMachine = require('javascript-state-machine');
+
+//const visualize = require('javascript-state-machine/lib/visualize');
+
+//console.log(visualize);
 
 let fsm = new StateMachine({
   init: 'initial',
@@ -47,19 +51,21 @@ let fsm = new StateMachine({
     onGoto:      function() { console.log('go to') }
   }
 });
+
+//console.log(visualize(fsm, { name: 'bot', orientation: 'horizontal' }));
 /*****************************************************************************/
 /* Required files */
 const fs = require('fs');
 
-let questions = JSON.parse(fs.readFileSync("questions/questions.json"));
+let questions = JSON.parse(fs.readFileSync("Questions/questions.json"));
 
-let puzzleMsg = JSON.parse(fs.readFileSync("flexMsgs/puzzleMsg.json"));
+let puzzleMsg = JSON.parse(fs.readFileSync("FlexMsgs/PuzzleMsg.json"));
 
-let startMsg = JSON.parse(fs.readFileSync("flexMsgs/startMsg.json"));
+let startMsg = JSON.parse(fs.readFileSync("FlexMsgs/StartMsg.json"));
 
-let passMsg = JSON.parse(fs.readFileSync("flexMsgs/passMsg.json"));
+let passMsg = JSON.parse(fs.readFileSync("FlexMsgs/PassMsg.json"));
 
-let failMsg = JSON.parse(fs.readFileSync("flexMsgs/failMsg.json"));
+let failMsg = JSON.parse(fs.readFileSync("FlexMsgs/FailMsg.json"));
 /*****************************************************************************/
 let questionNumber; /* The place of a question in array 'questions.contents' */
 let userNum;        /* The place of a question in array 'userLog.users'      */
@@ -81,11 +87,11 @@ let history = [];   /* The question that the user has seen */
 function wrongGuess(event) {
   if (++userWrong == maxWrong) {
     /* User reach the limit of wrong guess and fails the game */
-    failMsg.contents.body.contents[1].text = 
+    failMsg.contents.body.contents[0].text = 
       '謎底: ' + questions.contents[questionNumber].answer;
-    failMsg.contents.body.contents[2].text = 
+    failMsg.contents.body.contents[1].text = 
       '解答: ' + questions.contents[questionNumber].reason;
-    event.reply(failMsg);
+    event.reply(['真是太遜了', failMsg]);
     history = [];
     fsm.end();  /* into the 'end-of-game' state */
   } else {
@@ -99,7 +105,7 @@ function wrongGuess(event) {
 function rightGuess(event) {
   if (++userRight == maxRight) {
     /* User wins the game and goes into the 'end-of-game' state */
-    event.reply(passMsg);
+    event.reply(['你真了不起', passMsg]);
     history = [];
     fsm.end();
   }
@@ -271,51 +277,6 @@ async function saveUserLog(event, userLog) {
   }
 }
 /*****************************************************************************/
-async function responseMessage(event) {
-  /* Handle message events */
-  let userLog = JSON.parse(fs.readFileSync("users/users.json"));
-  await getUser(event, userLog);
-
-  console.log('user ' + event.source.userId);
-  console.log('message is '+ event.message.text);
-
-  if (questionNumber >= 0)
-    console.log('answer is ' + questions.contents[questionNumber].answer);
-
-  if (fsm.is('initial')) {
-    event.reply(startMsg);
-  } else if (fsm.is('end-of-game')) {
-    event.reply('本次遊戲已經結束');
-  } else {
-    checkAnswer(event);
-  }
-
-  await saveUserLog(event, userLog);
-  fs.writeFileSync('users/users.json', JSON.stringify(userLog, null, ' '), 'utf8');
-  
-  console.log('state is ' + fsm.state);
-}
-/*****************************************************************************/
-async function responsePostback(event) {
-  /* Handle postback event */
-  let userLog= JSON.parse(fs.readFileSync("users/users.json"));
-  await getUser(event, userLog);
-  
-  if (fsm.is('initial')) {
-    gameInit(event);
-  } else if (fsm.is('end-of-game')) {
-    leaveorAgain(event);
-  } else {
-    giveAssist(event);
-  }
-  await saveUserLog(event, userLog);
-  fs.writeFileSync('users/users.json', 
-    JSON.stringify(userLog, null, ' '), 'utf8');
-  console.log('user ' + event.source.userId);
-  console.log('postback is ' + event.postback.data);
-  console.log('state is ' + fsm.state);
-}
-/*****************************************************************************/
 let linebot = require('linebot');
 
 let bot = linebot({
@@ -324,12 +285,62 @@ let bot = linebot({
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
 });
 /*****************************************************************************/
-bot.on('message', function (event) {
-  responseMessage(event);
+bot.on('message', async function (event) {
+  /* Handle message events */
+  try {
+    if (event.message.text == undefined) {
+      event.reply('傳這什麼東西');
+    } else {
+      let userLog = JSON.parse(fs.readFileSync("users/users.json"));
+      await getUser(event, userLog);
+
+      console.log('user ' + event.source.userId);
+      console.log('message is '+ event.message.text);
+
+      if (questionNumber >= 0)
+        console.log('answer is ' + questions.contents[questionNumber].answer);
+
+      if (fsm.is('initial')) {
+        event.reply(startMsg);
+      } else if (fsm.is('end-of-game')) {
+        event.reply('本次遊戲已經結束');
+      } else {
+        checkAnswer(event);
+      }
+
+      await saveUserLog(event, userLog);
+      fs.writeFileSync('users/users.json', JSON.stringify(userLog, null, ' '), 'utf8');
+      
+      console.log('state is ' + fsm.state);
+    }
+  } catch (e) {
+      console.log(e);
+  }
 });
 /*****************************************************************************/
-bot.on('postback', function (event) {
-  responsePostback(event);
+bot.on('postback', async function (event) {
+  /* Handle postback event */
+  try {
+    let userLog= JSON.parse(fs.readFileSync("users/users.json"));
+    await getUser(event, userLog);
+    
+    if (fsm.is('initial')) {
+      gameInit(event);
+    } else if (fsm.is('end-of-game')) {
+      leaveorAgain(event);
+    } else {
+      giveAssist(event);
+    }
+    await saveUserLog(event, userLog);
+    fs.writeFileSync('users/users.json', 
+      JSON.stringify(userLog, null, ' '), 'utf8');
+    console.log('user ' + event.source.userId);
+    console.log('postback is ' + event.postback.data);
+    console.log('state is ' + fsm.state);
+  } catch (e) {
+    console.log(e);
+  }
+
 });
 /*****************************************************************************/
 bot.listen('/', process.env.PORT || 5000, function () {

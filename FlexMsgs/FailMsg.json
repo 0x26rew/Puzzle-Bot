@@ -1,6 +1,6 @@
 {
     "type": "flex",
-    "altText": "開始猜謎!",
+    "altText": "你輸了呦",
     "contents": {
       "type": "bubble",
       "header": {
@@ -13,17 +13,13 @@
             "size": "lg",
             "align": "center"
           }
-        ]
+        ],
+        "height": "60px"
       },
       "body": {
         "type": "box",
         "layout": "vertical",
         "contents": [
-          {
-            "type": "text",
-            "text": "真是太遜了",
-            "align": "center"
-          },
           {
             "type": "text",
             "text": "謎底",
