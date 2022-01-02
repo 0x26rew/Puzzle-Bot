@@ -3,6 +3,7 @@
   "altText": "你好厲害呦",
   "contents": {
     "type": "bubble",
+    "size": "kilo",
     "header": {
       "type": "box",
       "layout": "vertical",
@@ -14,7 +15,7 @@
           "align": "center"
         }
       ],
-      "height": "100px"
+      "height": "60px"
     },
     "footer": {
       "type": "box",
