@@ -321,7 +321,7 @@ bot.on('message', async function (event) {
 bot.on('postback', async function (event) {
   /* Handle postback event */
   try {
-    let userLog= JSON.parse(fs.readFileSync("users/users.json"));
+    let userLog= JSON.parse(fs.readFileSync("Users/users.json"));
     await getUser(event, userLog);
     
     if (fsm.is('initial')) {
@@ -332,7 +332,7 @@ bot.on('postback', async function (event) {
       giveAssist(event);
     }
     await saveUserLog(event, userLog);
-    fs.writeFileSync('users/users.json', 
+    fs.writeFileSync('Users/users.json', 
       JSON.stringify(userLog, null, ' '), 'utf8');
     console.log('user ' + event.source.userId);
     console.log('postback is ' + event.postback.data);
