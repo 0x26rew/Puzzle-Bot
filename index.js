@@ -291,7 +291,7 @@ bot.on('message', async function (event) {
     if (event.message.text == undefined) {
       event.reply('傳這什麼東西');
     } else {
-      let userLog = JSON.parse(fs.readFileSync("users/users.json"));
+      let userLog = JSON.parse(fs.readFileSync("Users/users.json"));
       await getUser(event, userLog);
 
       console.log('user ' + event.source.userId);
@@ -309,7 +309,7 @@ bot.on('message', async function (event) {
       }
 
       await saveUserLog(event, userLog);
-      fs.writeFileSync('users/users.json', JSON.stringify(userLog, null, ' '), 'utf8');
+      fs.writeFileSync('Users/users.json', JSON.stringify(userLog, null, ' '), 'utf8');
       
       console.log('state is ' + fsm.state);
     }
