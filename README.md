@@ -12,7 +12,7 @@
 
 ### Game Flow
 
-1. Add **Puzzle-Bot(問題最多的機器人)** on your [LINE](https://line.me/zh-hant/) .
+1. Add **Puzzle-Bot(問題最多的機器人)** on your [LINE](https://line.me/zh-hant/).
 2. Send any **text message** to Puzzle-Bot, it will reply a **flex message** with a **start button(開始猜謎)**.
 3. Press the start button,  Puzzle-Bot will send your first puzzle via a new flex message.
 4. User can choose to answer the question by sending a text message to Puzzle-Bot, or choose a button on puzzle message to press to **get a hints(我要提示)**, **change the puzzle to another(換個題目)** or **leave the game(我要放棄)**.

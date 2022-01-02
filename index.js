@@ -2,7 +2,7 @@
     
     <States>
     initial:  state before the game start.
-    gaming :  the user received a puzzle from bot and tries to figure it out
+    gaming :  the user received a riddle from bot and tries to figure it out
               without a hint.
     hinted :  the user is hinted while the current puzzle is unsolved.
     end-of-game: the user wins/loses the game, the robot will puzzleMsg if 
@@ -37,8 +37,9 @@ let fsm = new StateMachine({
     { name: 'restart',   from: ['initial', 'gaming', 'hinted', 'end-of-game'],
                          to: 'gaming' },
     { name: 'end',       from: ['gaming', 'hinted'],  to: 'end-of-game' },
-    { name: 'exit',      from: ['gaming', 'hinted', 'end-of-game'], to: 'initial' },
-    { name: 'goto', from: '*', to: function(s) { return s } }
+    { name: 'exit',      from: ['gaming', 'hinted', 'end-of-game'], 
+                         to: 'initial' },
+    { name: 'goto',      from: '*', to: function(s) { return s } }
   ],
   methods: {
     onWrong:     function() { console.log('wrong');},
@@ -309,7 +310,8 @@ bot.on('message', async function (event) {
       }
 
       await saveUserLog(event, userLog);
-      fs.writeFileSync('Users/users.json', JSON.stringify(userLog, null, ' '), 'utf8');
+      fs.writeFileSync('Users/users.json', JSON.stringify(userLog, null, ' '),
+                        'utf8');
       
       console.log('state is ' + fsm.state);
     }

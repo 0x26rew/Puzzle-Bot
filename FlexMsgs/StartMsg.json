@@ -1,62 +1,62 @@
 {
-    "type": "flex",
-    "altText": "開始猜謎!",
-    "contents": {
-      "type": "bubble",
-      "size": "kilo",
-      "header": {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [
-          {
-            "type": "text",
-            "text": "猜謎大挑戰",
-            "size": "lg",
-            "align": "center"
-          }
-        ]
-      },
-      "hero": {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [
-          {
-            "type": "text",
-            "text": "總共10題",
-            "wrap": true,
-            "size": "md",
-            "position": "relative",
-            "offsetStart": "none",
-            "offsetEnd": "none",
-            "align": "center"
+  "type": "flex",
+  "altText": "開始猜謎!",
+  "contents": {
+    "type": "bubble",
+    "size": "kilo",
+    "header": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "text",
+          "text": "猜謎大挑戰",
+          "size": "xl",
+          "align": "center"
+        }
+      ]
+    },
+    "hero": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "text",
+          "text": "總共10題",
+          "wrap": true,
+          "size": "md",
+          "position": "relative",
+          "offsetStart": "none",
+          "offsetEnd": "none",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "text": "可以使用6次提示",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "text": "答錯10次就算失敗!",
+          "align": "center"
+        }
+      ]
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "button",
+          "action": {
+            "type": "postback",
+            "label": "開始猜謎",
+            "data": "開始猜謎"
           },
-          {
-            "type": "text",
-            "text": "可以使用6次提示",
-            "align": "center"
-          },
-          {
-            "type": "text",
-            "text": "答錯10次就算失敗!",
-            "align": "center"
-          }
-        ]
-      },
-      "body": {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [
-          {
-            "type": "button",
-            "action": {
-              "type": "postback",
-              "label": "開始猜謎",
-              "data": "開始猜謎"
-            },
-            "height": "sm",
-            "style": "primary"
-          }
-        ]
-      }
+          "height": "sm",
+          "style": "primary"
+        }
+      ]
     }
+  }
 }
