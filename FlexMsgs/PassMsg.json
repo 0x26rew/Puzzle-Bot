@@ -27,7 +27,8 @@
             "label": "繼續玩",
             "data": "繼續玩"
           },
-          "style": "primary"
+          "style": "primary",
+          "height": "sm"
         },
         {
           "type": "button",
@@ -35,7 +36,8 @@
             "type": "postback",
             "label": "結束遊戲",
             "data": "結束遊戲"
-          }
+          },
+          "height": "sm"
         }
       ]
     }
