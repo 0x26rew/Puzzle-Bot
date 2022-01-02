@@ -314,7 +314,7 @@ bot.on('message', async function (event) {
       console.log('state is ' + fsm.state);
     }
   } catch (e) {
-      console.log(e);
+    console.log(e);
   }
 });
 /*****************************************************************************/
